@@ -6,6 +6,8 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.Assert;
 import org.testng.annotations.*;
 
+import java.time.Duration;
+
 public class FormTest {
     private WebDriver driver;
     private FormPage formPage;
@@ -14,9 +16,11 @@ public class FormTest {
     public void setUp(){
         driver = new ChromeDriver();
         driver.get("https://practice-automation.com/form-fields/");
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+        driver.manage().window().maximize();
     }
 
-    @Test(description = "")
+    @Test(description = "Тест проверяет заполнение формы и получение ответа 'Message received'")
     public void TestCase(){
         formPage = new FormPage(driver);
 
