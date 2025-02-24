@@ -11,8 +11,12 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
-
+/**
+ * Страница формы для тестирования ввода данных.
+ *
+ */
 public class FormPage extends BasePage{
 
     @FindBy(xpath = "//input[@name='name-input']")
@@ -54,22 +58,39 @@ public class FormPage extends BasePage{
         this.actions = new Actions(driver);
     }
 
+    /**
+     * Пользователь вводит имя в форму.
+     *
+     * @param name Имя пользователя.
+     * @return {@link FormPage}.
+     */
     public FormPage enterName(String name){
         actions.moveToElement(this.name).perform();
         this.name.sendKeys(name);
         return this;
     }
 
+    /**
+     * Пользователь вводит пароль в форму.
+     *
+     * @param password Пароль пользователя.
+     * @return {@link FormPage}.
+     */
     public FormPage enterPassword(String password) {
         actions.moveToElement(this.password).perform();
         this.password.sendKeys(password);
         return this;
     }
 
+    /**
+     * Пользователь выбирает любимые напитки.
+     *
+     * @param options Напитки, выбранные пользователем.
+     * @return {@link FormPage}.
+     */
     public FormPage selectFavoriteDrink(String... options){
 
         for(String option : options){
-
             WebElement checkBoxToSelect = drinksCheckBoxMap.get(option);
 
             if (checkBoxToSelect != null){
@@ -79,17 +100,17 @@ public class FormPage extends BasePage{
                 if(!checkBoxToSelect.isSelected()){
                     checkBoxToSelect.click();
                 }
-
             }
-
         }
-
         return this;
-
-
-//        System.out.println(checkBox.get(0).getDomAttribute("value"));
     }
 
+    /**
+     * Пользователь выбирает цвет в форме.
+     *
+     * @param color Название цвета.
+     * @return {@link FormPage}.
+     */
     public FormPage selectColor(String color) {
 
         for (WebElement colorRadioButton : colorsRadioButtons){
@@ -104,26 +125,26 @@ public class FormPage extends BasePage{
         return this;
     }
 
-    private HashMap<String, WebElement> initMap(List<WebElement> list){
-
-        HashMap<String, WebElement> map = new HashMap<>();
-
-        for (WebElement element : list){
-            String value = element.getDomAttribute("value");
-            map.put(value, element);
-        }
-
-        return map;
-    }
-
+    /**
+     * Пользователь выбирает вариант из выпадающего меню (про автоматизацию).
+     *
+     * @param option Вариант из выпадающего меню.
+     * @return {@link FormPage}.
+     */
     public FormPage selectDropDownAutomation(String option) {
         actions.scrollToElement(selectAutomation).perform();
-        Select select = new Select(selectAutomation);
-        select.selectByVisibleText(option);
+        Select automationSelect = new Select(selectAutomation);
+        automationSelect.selectByVisibleText(option);
 
         return this;
     }
 
+    /**
+     * Пользователь вводит электронную почту.
+     *
+     * @param email Адрес электронной почты.
+     * @return {@link FormPage}.
+     */
     public FormPage enterEmail(String email) {
         actions.scrollToElement(this.email).perform();
         this.email.sendKeys(email);
@@ -131,6 +152,12 @@ public class FormPage extends BasePage{
         return this;
     }
 
+    /**
+     * Пользователь вводит сообщение в форму, указывая количество элементов в списке Automations Tools
+     * и на следующей строке вводит название инструмента, которое имеет наибольшее количество символов.
+     *
+     * @return {@link FormPage}.
+     */
     public FormPage enterMessage(){
         actions.scrollToElement(this.messageArea).perform();
         String inputText = automationToolsElements.size() + "\n" + findMaxLengthWord();
@@ -139,6 +166,12 @@ public class FormPage extends BasePage{
         return this;
     }
 
+    /**
+     * Пользователь вводит произвольный текст в форму.
+     *
+     * @param text Сообщение пользователя
+     * @return {@link FormPage}
+     */
     public FormPage enterMessage(String text){
         actions.scrollToElement(this.messageArea).perform();
         messageArea.sendKeys(text);
@@ -146,16 +179,39 @@ public class FormPage extends BasePage{
         return this;
     }
 
+    /**
+     * Пользователь нажимает на кнопку <b><i>Submit</i></b>.
+     */
     public void submit(){
         actions.scrollToElement(this.email).perform();
         submitButton.submit();
     }
 
+    /**
+     * Находит слово максимальной длины из списка "Automations Tools".
+     * @return Слово максимальной длины, либо пустую строку, если список пуст.
+     */
     private String findMaxLengthWord(){
         return automationToolsElements.stream()
                 .map(WebElement::getText)
-                .max(Comparator.comparing(String::length))
+                .max(Comparator.comparingInt(String::length))
                 .orElse("");
+    }
+
+    /**
+     * Преобразует список элементов в словарь.
+     *
+     * @param list Массив {@link WebElement}, который требуется преобразовать.
+     * @return возвращает {@link HashMap}, где ключ - значение атрибута "value", а значение - {@link WebElement}
+     */
+    private HashMap<String, WebElement> initMap(List<WebElement> list){
+        return list.stream()
+                .collect(Collectors.toMap(
+                        element -> element.getDomAttribute("value"),
+                        element -> element,
+                        (existing, replacement) -> existing,
+                        HashMap::new
+                ));
     }
 
 }
