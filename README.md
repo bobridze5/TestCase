@@ -36,7 +36,7 @@
 
 ## Структура проекта
 ```
-ui-test-project/
+project/
 ├── src/
 │   ├── main/
 │   │   ├── java/
